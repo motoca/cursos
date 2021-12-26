@@ -10,9 +10,9 @@ interface FormularioProps {
 }
 
 export default function Formulario (props: FormularioProps) {
-    const id = props.cliente?.Id
-    const [nome, setNome] = useState(props.cliente?.Nome ?? '')
-    const [idade, setIdade] = useState(props.cliente?.Idade ?? 999)
+    const id = props.cliente?.id
+    const [nome, setNome] = useState(props.cliente?.nome ?? '')
+    const [idade, setIdade] = useState(props.cliente?.idade ?? 999)
     
     return (
         <div>
@@ -27,7 +27,7 @@ export default function Formulario (props: FormularioProps) {
                 tipo="number" className="mb-5" />
             <div className="flex justify-end mt-7">
                 <Botao cor="blue" className="mr-2"
-                    onClick={() => props.clienteMudou?.(new Cliente(id, nome, +idade))}>
+                    onClick={() => props.clienteMudou?.(new Cliente(nome, +idade, id))}>
                     {id ? 'Alterar' : 'Salvar'}
                 </Botao>
                 <Botao cor="gray"

@@ -17,7 +17,7 @@ export default function Home() {
     
     getClientes().then((clientes) => {
         for (const cliente of clientes) {
-            console.log("Nome: "+cliente.nome)
+            console.log("Nome: "+cliente.parent+"-"+cliente.nome)
         }
     })
 

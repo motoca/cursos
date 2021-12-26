@@ -1,27 +1,27 @@
 export default class Cliente {
-    private id: string;
-    private nome: string;
-    private idade: number;
+    #id: string;
+    #nome: string;
+    #idade: number;
 
-    constructor(id: string = null, nome: string, idade: number) {
-        this.id = id;
-        this.nome = nome;
-        this.idade = idade;
+    constructor(nome: string, idade: number, id: string = null) {
+        this.#id = id;
+        this.#nome = nome;
+        this.#idade = idade;
     }
 
     static vazio() {
-        return new Cliente(null, '', 0)
+        return new Cliente('', 0, null)
     }
 
-    get Id(): string {
-        return this.id
+    get id(): string {
+        return this.#id
     }
 
-    get Nome(): string {
-        return this.nome
+    get nome(): string {
+        return this.#nome
     }
 
-    get Idade(): number {
-        return this.idade
+    get idade(): number {
+        return this.#idade
     }
 }

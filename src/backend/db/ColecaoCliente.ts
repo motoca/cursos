@@ -1,59 +1,51 @@
 import Cliente from "../../core/Cliente";
 import ClienteRepositorio from "../../core/ClienteRepositorio";
 import dbClientes from "../../backend/config"
-import { FirestoreDataConverter, collection, getDocs } from 'firebase/firestore/lite';
-// import firebase from "../config";
+import { FirestoreDataConverter, collection, doc, getDocs, getDoc, setDoc, addDoc, deleteDoc } from 'firebase/firestore/lite';
 
 
 export default class ColecaoCliente implements ClienteRepositorio {
 
-    clientesCol = collection(dbClientes, 'clientes');
+    clientes = collection(dbClientes, 'clientes').withConverter(clienteConverter);
+
+    async obterTodos(): Promise<Cliente[]> {
+        const clientesSnapshot = await getDocs(this.clientes);
+        const data = clientesSnapshot.docs.map(doc => doc.data());
+        return data;
+    }
 
     async salvar(cliente: Cliente): Promise<Cliente> {
-        if (cliente?.Id) {
-            await this.colecao().doc(cliente.Id).set(cliente)
+        if (cliente?.id) {
+            const docRef = doc(this.clientes, cliente.id).withConverter(clienteConverter);
+            await setDoc(docRef, cliente);
             return cliente
         } else {
-            const docRef = await this.colecao().doc().add(cliente)
-            const doc = await docRef.get()
-            return doc.data()
+            const docRef = await addDoc(this.clientes, cliente);
+            const doc = await getDoc(docRef);
+            return doc.data();
         }
     }
 
     async excluir(cliente: Cliente): Promise<void> {
-        return this.colecao().doc(cliente.Id).delete()
-    }
-
-    async obterTodos(): Promise<Cliente[]> {
-        const clientesCol = collection(dbClientes, 'clientes').withConverter(clienteConverter);
-        const clientesSnapshot = await getDocs(clientesCol);
-        return clientesSnapshot.docs.map(doc => doc.data());
-    }
-
-    private colecao() {
-        // return firebase.firestore().collection('clientes').withConverter(this.#clienteConverter)
-        return this.clientesCol.withConverter(clienteConverter);
+        const docRef = doc(this.clientes, cliente.id).withConverter(clienteConverter);
+        return await deleteDoc(docRef);
     }
 }
 
-async function getClientes() {
-    const clientesCol = collection(dbClientes, 'clientes');
-    const clientesSnapshot = await getDocs(clientesCol);
-    const clientesList = clientesSnapshot.docs.map(doc => doc.data());
-    return clientesList;
-}
-
-// Firestore data converter
 const clienteConverter:FirestoreDataConverter<Cliente>  = {
     toFirestore: (cliente: Cliente) => {
         return {
-            id: cliente.Id,
-            nome: cliente.Nome,
-            idade: cliente.Idade
+            id: cliente.id,
+            nome: cliente.nome,
+            idade: cliente.idade
         };
     },
-    fromFirestore: (snapshot): Cliente => {
-        const data = snapshot.data();
-        return new Cliente(data.id, data.nome, data.idade);
+    fromFirestore: (doc): Cliente => {
+        const data = doc.data();
+        // for (const d in data) {
+        //     console.log("DADOS: "+ docId + " - " +data.nome + " - " + data.idade);
+        // }
+
+        return new Cliente(data.nome, data.idade, doc.id);
     }
 }

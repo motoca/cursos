@@ -2,23 +2,6 @@ import dbClientes from "../backend/config"
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 
-// export default function Home() {
-//   getClientes().then((clientes) => {
-//     for (const cliente of clientes) {
-//       console.log("Nome: " + cliente.nome)
-//     }
-//   })
-
-//   return "CLIENTES: ";
-// }
-
-// async function getClientes() {
-//   const clientesCol = collection(dbClientes, 'clientes');
-//   const clientesSnapshot = await getDocs(clientesCol);
-//   const clientesList = clientesSnapshot.docs.map(doc => doc.data());
-//   return clientesList;
-// }
-
 import { useEffect, useState } from "react";
 import ColecaoCliente from "../backend/db/ColecaoCliente";
 import Botao from "../components/Botao";
@@ -50,9 +33,9 @@ export default function Home() {
     setVisivel('form')
   }
 
-  function clienteExcluido(cliente: Cliente) {
-    console.log('Cliente excluido: '+cliente);
-    setVisivel('form')
+  async function clienteExcluido(cliente: Cliente) {
+    await repo.excluir(cliente);
+    obterTodos()
   }
 
   function novoCliente() {
@@ -77,7 +60,7 @@ export default function Home() {
             <div className="flex justify-end">
               <Botao cor="green" className="mb-4"
                 onClick={novoCliente}>
-                Novo Clientes
+                Novo Cliente
               </Botao>
             </div>
             <Tabela clientes={clientes} 
